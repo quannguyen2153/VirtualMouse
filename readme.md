@@ -5,7 +5,7 @@
 
 ## How It Work
 
-This app detects your hands via your webcam and controls the cursor based on your hand gestures.
+**Virtual Mouse** detects your hands via your webcam and controls the cursor based on your hand gestures.
 
 ## Guide
 
