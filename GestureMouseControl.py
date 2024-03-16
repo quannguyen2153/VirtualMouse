@@ -88,7 +88,7 @@ class GestureMouseControl:
             if self.raised_fingers[1] == True and self.raised_fingers[2] == True and self.raised_fingers.count(False) >= 3:
                 mouse.release()
                 
-                if self.hand_detector.isTouching(self.main_hand, 1, 2):
+                if self.hand_detector.isIndexMiddleTouching(self.main_hand):
                     x_mid, y_mid = self.scaled_landmarks_position[12][:-1]
 
                     if x_mid > self.x_frame_reduction + self.x_offset and x_mid < self.image_width - self.x_frame_reduction + self.x_offset and y_mid > self.y_frame_reduction + self.y_offset and y_mid < self.image_height - self.y_frame_reduction + self.y_offset:
@@ -177,7 +177,7 @@ class GestureMouseControl:
                 if self.raised_fingers.count(False) >= 3:
                     x_mid, y_mid = self.scaled_landmarks_position[12][:-1]
 
-                    if self.hand_detector.isTouching(self.main_hand, 1, 2):
+                    if self.hand_detector.isIndexMiddleTouching(self.main_hand):
                         if not self.is_clicked1:
                             mouse.press(button='left')
                         else:
@@ -205,7 +205,7 @@ class GestureMouseControl:
                 elif self.raised_fingers[4] == True and self.raised_fingers.count(False) >= 2:
                     x_mid, y_mid = self.scaled_landmarks_position[12][:-1]
 
-                    if self.hand_detector.isTouching(self.main_hand, 1, 2):
+                    if self.hand_detector.isIndexMiddleTouching(self.main_hand):
                         if not self.is_clicked1:
                             mouse.press(button='right')
                         else:
@@ -235,7 +235,7 @@ class GestureMouseControl:
 
                     x_mid, y_mid = self.scaled_landmarks_position[12][:-1]
 
-                    if self.hand_detector.isTouching(self.main_hand, 1, 2) and self.hand_detector.get2DDistance(self.main_hand, 12, 16) < self.click_threshold:
+                    if self.hand_detector.isIndexMiddleTouching(self.main_hand) and self.hand_detector.isMiddleRingTouching(self.main_hand):
                         if not self.is_clicked1:
                             mouse.double_click(button='left')
 
