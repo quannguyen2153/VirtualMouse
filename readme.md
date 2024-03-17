@@ -25,8 +25,6 @@
 
     - Double left-click: Raise and touch your index, middle, and ring fingers together.
 
-    - Double right-click: Raise your pinky finger, then raise and touch your index, middle, and ring fingers together.
-
 2. Two-Hands Control (Use your right hand with fingers not mentioned should be closed):
 
     - Move control box: Put your hand inside the box, then raise and touch your index finger and middle finger together to move the control box.
