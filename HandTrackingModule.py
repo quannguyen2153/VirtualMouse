@@ -94,11 +94,28 @@ class HandDetector():
 
     def getLandmarksPosition(self, hand_label, scale=False):
         return self.scaled_hand_landmarks[hand_label] if scale else self.hand_landmarks[hand_label]
+    
+    def getLandmark2DPostition(self, landmark):
+        return np.array([landmark.x, landmark.y])
+    
+    def createVector2(self, start_point, end_point):
+        return np.array([end_point.x - start_point.x, end_point.y - start_point.y])
+    
+    def computeAngle(self, v1, v2):
+        # Normalize the vectors
+        v1_u = v1 / np.linalg.norm(v1)
+        v2_u = v2 / np.linalg.norm(v2)
+        
+        # Compute the angle (in radian) using the dot product
+        angle = np.arccos(np.clip(np.dot(v1_u, v2_u), -1.0, 1.0))
+        
+        # Return angle (in radian)
+        return angle
 
     def getRaisedFingers(self, flipped=False):
         raised_fingers = {
-            HandType.LEFT_HAND.value: [False, False, False, False, False],
-            HandType.RIGHT_HAND.value: [False, False, False, False, False]
+            HandType.LEFT_HAND.value: [],
+            HandType.RIGHT_HAND.value: []
         }
 
         if not self.results.multi_hand_landmarks:
@@ -106,47 +123,67 @@ class HandDetector():
         
         if HandType.LEFT_HAND.value in self.hands_detected:
             # Check thumb
-            if self.computeAngle(self.createVector2(self.hand_landmarks[HandType.LEFT_HAND.value][3], self.hand_landmarks[HandType.LEFT_HAND.value][4]),
-                                 self.createVector2(self.hand_landmarks[HandType.LEFT_HAND.value][0], self.hand_landmarks[HandType.LEFT_HAND.value][1])) < 0.873:
-                raised_fingers[HandType.LEFT_HAND.value][0] = True
+            if self.computeAngle(self.createVector2(self.hand_landmarks[HandType.LEFT_HAND.value][2], self.hand_landmarks[HandType.LEFT_HAND.value][4]),
+                                 self.createVector2(self.hand_landmarks[HandType.LEFT_HAND.value][0], self.hand_landmarks[HandType.LEFT_HAND.value][1])) < 0.524:
+                raised_fingers[HandType.LEFT_HAND.value].append(True)
+            else:
+                raised_fingers[HandType.LEFT_HAND.value].append(False)
             # Check index
             if self.computeAngle(self.createVector2(self.hand_landmarks[HandType.LEFT_HAND.value][6], self.hand_landmarks[HandType.LEFT_HAND.value][8]),
                                  self.createVector2(self.hand_landmarks[HandType.LEFT_HAND.value][0], self.hand_landmarks[HandType.LEFT_HAND.value][5])) < 1.745:
-                raised_fingers[HandType.LEFT_HAND.value][1] = True
+                raised_fingers[HandType.LEFT_HAND.value].append(True)
+            else:
+                raised_fingers[HandType.LEFT_HAND.value].append(False) 
             # Check middle
             if self.computeAngle(self.createVector2(self.hand_landmarks[HandType.LEFT_HAND.value][10], self.hand_landmarks[HandType.LEFT_HAND.value][12]),
                                  self.createVector2(self.hand_landmarks[HandType.LEFT_HAND.value][0], self.hand_landmarks[HandType.LEFT_HAND.value][9])) < 1.745:
-                raised_fingers[HandType.LEFT_HAND.value][2] = True
+                raised_fingers[HandType.LEFT_HAND.value].append(True)
+            else:
+                raised_fingers[HandType.LEFT_HAND.value].append(False)
             # Check ring
             if self.computeAngle(self.createVector2(self.hand_landmarks[HandType.LEFT_HAND.value][14], self.hand_landmarks[HandType.LEFT_HAND.value][16]),
                                  self.createVector2(self.hand_landmarks[HandType.LEFT_HAND.value][0], self.hand_landmarks[HandType.LEFT_HAND.value][13])) < 1.745:
-                raised_fingers[HandType.LEFT_HAND.value][3] = True
+                raised_fingers[HandType.LEFT_HAND.value].append(True)
+            else:
+                raised_fingers[HandType.LEFT_HAND.value].append(False)
             # Check pinky
             if self.computeAngle(self.createVector2(self.hand_landmarks[HandType.LEFT_HAND.value][18], self.hand_landmarks[HandType.LEFT_HAND.value][20]),
                                  self.createVector2(self.hand_landmarks[HandType.LEFT_HAND.value][0], self.hand_landmarks[HandType.LEFT_HAND.value][17])) < 1.745:
-                raised_fingers[HandType.LEFT_HAND.value][4] = True
+                raised_fingers[HandType.LEFT_HAND.value].append(True)
+            else:
+                raised_fingers[HandType.LEFT_HAND.value].append(False)
                 
         if HandType.RIGHT_HAND.value in self.hands_detected:
             # Check thumb
-            if self.computeAngle(self.createVector2(self.hand_landmarks[HandType.RIGHT_HAND.value][3], self.hand_landmarks[HandType.RIGHT_HAND.value][4]),
-                                 self.createVector2(self.hand_landmarks[HandType.RIGHT_HAND.value][0], self.hand_landmarks[HandType.RIGHT_HAND.value][1])) < 0.873:
-                raised_fingers[HandType.RIGHT_HAND.value][0] = True
+            if self.computeAngle(self.createVector2(self.hand_landmarks[HandType.RIGHT_HAND.value][2], self.hand_landmarks[HandType.RIGHT_HAND.value][4]),
+                                 self.createVector2(self.hand_landmarks[HandType.RIGHT_HAND.value][0], self.hand_landmarks[HandType.RIGHT_HAND.value][1])) < 0.524:
+                raised_fingers[HandType.RIGHT_HAND.value].append(True)
+            else:
+                raised_fingers[HandType.RIGHT_HAND.value].append(False)
             # Check index
             if self.computeAngle(self.createVector2(self.hand_landmarks[HandType.RIGHT_HAND.value][6], self.hand_landmarks[HandType.RIGHT_HAND.value][8]),
                                  self.createVector2(self.hand_landmarks[HandType.RIGHT_HAND.value][0], self.hand_landmarks[HandType.RIGHT_HAND.value][5])) < 1.745:
-                raised_fingers[HandType.RIGHT_HAND.value][1] = True
+                raised_fingers[HandType.RIGHT_HAND.value].append(True)
+            else:
+                raised_fingers[HandType.RIGHT_HAND.value].append(False) 
             # Check middle
             if self.computeAngle(self.createVector2(self.hand_landmarks[HandType.RIGHT_HAND.value][10], self.hand_landmarks[HandType.RIGHT_HAND.value][12]),
                                  self.createVector2(self.hand_landmarks[HandType.RIGHT_HAND.value][0], self.hand_landmarks[HandType.RIGHT_HAND.value][9])) < 1.745:
-                raised_fingers[HandType.RIGHT_HAND.value][2] = True
+                raised_fingers[HandType.RIGHT_HAND.value].append(True)
+            else:
+                raised_fingers[HandType.RIGHT_HAND.value].append(False)
             # Check ring
             if self.computeAngle(self.createVector2(self.hand_landmarks[HandType.RIGHT_HAND.value][14], self.hand_landmarks[HandType.RIGHT_HAND.value][16]),
                                  self.createVector2(self.hand_landmarks[HandType.RIGHT_HAND.value][0], self.hand_landmarks[HandType.RIGHT_HAND.value][13])) < 1.745:
-                raised_fingers[HandType.RIGHT_HAND.value][3] = True
+                raised_fingers[HandType.RIGHT_HAND.value].append(True)
+            else:
+                raised_fingers[HandType.RIGHT_HAND.value].append(False)
             # Check pinky
             if self.computeAngle(self.createVector2(self.hand_landmarks[HandType.RIGHT_HAND.value][18], self.hand_landmarks[HandType.RIGHT_HAND.value][20]),
                                  self.createVector2(self.hand_landmarks[HandType.RIGHT_HAND.value][0], self.hand_landmarks[HandType.RIGHT_HAND.value][17])) < 1.745:
-                raised_fingers[HandType.RIGHT_HAND.value][4] = True
+                raised_fingers[HandType.RIGHT_HAND.value].append(True)
+            else:
+                raised_fingers[HandType.RIGHT_HAND.value].append(False)
 
         # hand_labels = tuple(self.hand_landmarks.keys())
 
@@ -232,23 +269,6 @@ class HandDetector():
             return True
             
         return False
-    
-    def getLandmark2DPostition(self, landmark):
-        return np.array([landmark.x, landmark.y])
-    
-    def createVector2(self, start_point, end_point):
-        return np.array([end_point.x - start_point.x, end_point.y - start_point.y])
-    
-    def computeAngle(self, v1, v2):
-        # Normalize the vectors
-        v1_u = v1 / np.linalg.norm(v1)
-        v2_u = v2 / np.linalg.norm(v2)
-        
-        # Compute the angle (in radian) using the dot product
-        angle = np.arccos(np.clip(np.dot(v1_u, v2_u), -1.0, 1.0))
-        
-        # Return angle (in radian)
-        return angle
 
 
 def getFPS():
