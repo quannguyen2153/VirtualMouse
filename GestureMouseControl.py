@@ -3,6 +3,7 @@ import numpy as np
 import HandTrackingModule as htm
 import screeninfo
 import mouse
+import time
 
 class GestureMouseControl:
     def __init__(self,
@@ -37,12 +38,17 @@ class GestureMouseControl:
 
         self.hand_detector = htm.HandDetector(min_detection_confidence=min_detection_confidence, min_tracking_confidence=min_tracking_confidence)
 
+        self.is_control = False
+
         self.plocX = 0
         self.plocY = 0
         self.clocX = 0
         self.clocY = 0
         self.is_clicked1 = False
         self.is_clicked2 = False
+        
+        self.end_count_down = None
+        self.end_count_down_time = 0
 
     def process(self, image):
         self.processing_image = image
@@ -74,14 +80,28 @@ class GestureMouseControl:
         return self.processing_image
 
     def is2HandControlActivated(self):
-        if not self.is_clicked1 and self.main_hand in self.hands_detected and self.other_hand in self.hands_detected:
-            return True
-        return False
+        if not self.is_control:
+            return False
+        if self.is_clicked1:
+            return False
+        if not self.main_hand in self.hands_detected:
+            return False
+        if not self.other_hand in self.hands_detected:
+            return False
+        
+        return True
 
     def is1HandControlActivated(self):
-        if not self.is_clicked2 and self.main_hand in self.hands_detected and self.other_hand not in self.hands_detected:
-            return True
-        return False
+        if not self.is_control:
+            return False
+        if self.is_clicked2:
+            return False
+        if not self.main_hand in self.hands_detected:
+            return False        
+        if self.other_hand in self.hands_detected:
+            return False
+        
+        return True
 
     def extendedControl(self, visualized=False):
         if self.is2HandControlActivated():
@@ -278,9 +298,37 @@ class GestureMouseControl:
         if visualized:
             return self.processing_image
 
-    def endControl(self):
-        if self.is2HandControlActivated() and self.raised_fingers[4] == True and self.raised_fingers.count(False) >= 4 and self.other_raised_fingers[4] == True and self.other_raised_fingers.count(False) >= 4:
-            return True
+    def isControlOff(self):
+        if self.main_hand not in self.hands_detected or self.other_hand not in self.hands_detected:
+            return False
+        
+        if self.raised_fingers[3] == True and self.raised_fingers.count(False) >= 4 and self.other_raised_fingers[4] == True and self.other_raised_fingers.count(False) >= 4:
+            self.is_control = True
+            self.end_count_down = None
+            self.end_count_down_time = 0
+            
+            mouse.release()
+            self.is_clicked1 = False
+            self.is_clicked2 = False
+        
+        elif self.raised_fingers[4] == True and self.raised_fingers.count(False) >= 4 and self.other_raised_fingers[4] == True and self.other_raised_fingers.count(False) >= 4:
+            self.is_control = False
+            
+            mouse.release()
+            self.is_clicked1 = False
+            self.is_clicked2 = False
+            
+            if self.end_count_down is None:
+                self.end_count_down = time.perf_counter()
+            else:
+                self.end_count_down_time = time.perf_counter() - self.end_count_down
+                if self.end_count_down_time >= 3:                
+                    return True
+                
+        else:
+            self.end_count_down = None
+            self.end_count_down_time = 0
+        
         return False
 
 wCam, hCam = 800, 450
@@ -310,10 +358,11 @@ while True:
     fps = htm.getFPS()
 
     cv2.putText(img, "FPS: " + str(int(fps)), (10, 20), cv2.FONT_HERSHEY_PLAIN, 1, (0, 255, 0), 1)
+    cv2.putText(img, "Active" if gesture_mouse_control.is_control else f"Turn off in {int(3 - gesture_mouse_control.end_count_down_time)}s" if gesture_mouse_control.end_count_down_time >= 0.5 else "Not Active", (10, hCam), cv2.FONT_HERSHEY_PLAIN, 1, (0, 255, 0), 1)
 
     cv2.imshow("Laptop Webcam", img)
 
-    if (cv2.waitKey(1) & 0xFF == ord('q')) or gesture_mouse_control.endControl():
+    if (cv2.waitKey(1) & 0xFF == ord('q')) or gesture_mouse_control.isControlOff():
         break
     
 cap.release()

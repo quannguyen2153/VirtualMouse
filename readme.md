@@ -5,7 +5,7 @@
 
 ## How It Work
 
-**Virtual Mouse** detects your hands via your webcam and controls the cursor based on your hand gestures.
+**Virtual Mouse** detects your hands via your webcam and controls the cursor based on the hand gestures.
 
 ## Guide
 
@@ -29,4 +29,8 @@
 
     - Move control box: Put your hand inside the box, then raise and touch your index finger and middle finger together to move the control box.
 
-    - Close app: Raise your pinky finger of two hands to close.
+    - Enable: Raise the pinky finger of your left hand and the ring finger of your right hand to enable the virtual mouse.
+
+    - Disable: Raise your pinky finger of two hands to disable the virtual mouse.
+
+    - Close: Raise your pinky finger of two hands in 3 seconds to close the app.
